@@ -1,0 +1,26 @@
+{
+  "name": "D3",
+  "version": "1.0.0",
+  "description": "D3 Data visualization",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "devstart": "nodemon server.js"
+  },
+  "keywords": [
+    "D3",
+    "data-visualization",
+    "svg"
+  ],
+  "author": "Raju Rimal",
+  "license": "MIT",
+  "dependencies": {
+    "d3": "^6.3.1",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "express-ejs-layouts": "^2.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}

@@ -1,0 +1,14 @@
+<h1 class="mt-5">Charts</h1>
+
+<div class="d-flex justify-content-between">
+    <% cardInfo.forEach(card => { %>
+    <div class="card" style="width: 30%;">
+        <div class="card-body">
+            <h5 class="card-title"><%= card.title %></h5>
+            <h6 class="card-subtitle mb-2 text-muted"><%= card.subtitle %></h6>
+            <p class="card-text"><%= card.desc %></p>
+            <a href="<%= card.link %>" class="card-link"><%= card.title %></a>
+        </div>
+    </div>
+    <% }) %>
+</div>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+
+<%- include('../partials/head.ejs') %>
+
+<body class="d-flex flex-column h-100">
+    <%- include('../partials/header.ejs') %>
+    <div class="container d-flex w-100">
+        <main class="flex-shrink-0 flex-fill">
+            <%- body %>
+        </main>
+        <side class="flex-shrink-0 w-25">
+            <h1 class="mt-5">Sidebar</h1>
+        </side>
+    </div>
+    <%- include('../partials/footer.ejs') %>
+</body>
+
+</html>
