@@ -2,16 +2,18 @@ async function drawScatter() {
   // 1. Access data
   let dataset = await d3.json("../data/my_weather_data.json");
 
-  const xAccessor = (d) => d.dewPoint;
-  const yAccessor = (d) => d.humidity;
-  const colorAccessor = (d) => d.cloudCover;
+  const getX = (d) => d.dewPoint;
+  const getY = (d) => d.humidity;
+  const getColor = (d) => d.cloudCover;
 
-  // 2. Create chart dimensions
-
-  const width = d3.min([window.innerWidth * 0.5, window.innerHeight * 0.5]);
-  let dimensions = {
-    width: width,
-    height: width,
+  // 2. Create chart dimension
+  const chartSideLength = d3.min([
+    window.innerWidth * 0.5,
+    window.innerHeight * 0.5,
+  ]);
+  let dimension = {
+    width: chartSideLength,
+    height: chartSideLength,
     margin: {
       top: 10,
       right: 10,
@@ -19,86 +21,97 @@ async function drawScatter() {
       left: 50,
     },
   };
-  dimensions.boundedWidth =
-    dimensions.width - dimensions.margin.left - dimensions.margin.right;
-  dimensions.boundedHeight =
-    dimensions.height - dimensions.margin.top - dimensions.margin.bottom;
+  dimension.boundWidth =
+    dimension.width - dimension.margin.left - dimension.margin.right;
+  dimension.boundHeight =
+    dimension.height - dimension.margin.top - dimension.margin.bottom;
 
   // 3. Draw canvas
-
   const wrapper = d3
     .select("#chart-2")
     .append("svg")
-    .attr("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`);
+    .attr("viewBox", `0 0 ${dimension.width} ${dimension.height}`);
 
   const bounds = wrapper
     .append("g")
     .style(
       "transform",
-      `translate(${dimensions.margin.left}px, ${dimensions.margin.top}px)`
+      `translate(${dimension.margin.left}px, ${dimension.margin.top}px)`
     );
 
   // 4. Create scales
-
   const xScale = d3
     .scaleLinear()
-    .domain(d3.extent(dataset, xAccessor))
-    .range([0, dimensions.boundedWidth])
+    .domain(d3.extent(dataset, getX))
+    .range([0, dimension.boundWidth])
     .nice();
-
   const yScale = d3
     .scaleLinear()
-    .domain(d3.extent(dataset, yAccessor))
-    .range([dimensions.boundedHeight, 0])
+    .domain(d3.extent(dataset, getY))
+    .range([dimension.boundHeight, 0])
     .nice();
-
   const colorScale = d3
     .scaleLinear()
-    .domain(d3.extent(dataset, colorAccessor))
-    .range(["skyblue", "darkslategrey"]);
+    .domain(d3.extent(dataset, getColor))
+    .range(["#B7CEF2", "#2979B3"]);
 
-  // 5. Draw data
-
-  const dots = bounds
-    .selectAll("circle")
-    .data(dataset)
-    .enter()
-    .append("circle")
-    .attr("cx", (d) => xScale(xAccessor(d)))
-    .attr("cy", (d) => yScale(yAccessor(d)))
-    .attr("r", 4)
-    .attr("fill", (d) => colorScale(colorAccessor(d)))
-    .attr("tabindex", "0");
-
-  // 6. Draw peripherals
-
+  // 5. Draw Axis and Axis Labels for the plot
+  // 5a. X-Axis
   const xAxisGenerator = d3.axisBottom().scale(xScale);
-
   const xAxis = bounds
     .append("g")
     .call(xAxisGenerator)
-    .style("transform", `translateY(${dimensions.boundedHeight}px)`);
-
+    .style("transform", `translateY(${dimension.boundHeight}px)`);
   const xAxisLabel = xAxis
     .append("text")
-    .attr("x", dimensions.boundedWidth / 2)
-    .attr("y", dimensions.margin.bottom - 10)
+    .attr("x", dimension.boundWidth / 2)
+    .attr("y", dimension.margin.bottom - 10)
     .attr("fill", "black")
-    .style("font-size", "1.4em")
-    .html("Dew point (&deg;F)");
+    .style("font-family", "monospace")
+    .style("font-size", "1.2em")
+    .html("Due Point (&deg;F)");
 
-  const yAxisGenerator = d3.axisLeft().scale(yScale).ticks(4);
-
+  // 5b. Y-Axis
+  const yAxisGenerator = d3.axisLeft().scale(yScale);
   const yAxis = bounds.append("g").call(yAxisGenerator);
-
   const yAxisLabel = yAxis
     .append("text")
-    .attr("x", -dimensions.boundedHeight / 2)
-    .attr("y", -dimensions.margin.left + 10)
+    .attr("x", -dimension.boundHeight / 2)
+    .attr("y", -dimension.margin.left + 10)
     .attr("fill", "black")
-    .style("font-size", "1.4em")
-    .text("Relative humidity")
-    .style("transform", "rotate(-90deg)")
-    .style("text-anchor", "middle");
+    .style("font-family", "monospace")
+    .style("font-size", "1.2em")
+    .style("transform", "rotate(-90deg)") // This line rotate everything including x and y
+    .style("text-anchor", "middle")
+    .html("Relative Humidity");
+
+  // 5c. Legend -
+  const colorLegendGenerator = d3.legendColor().scale(colorScale);
+  const legend = bounds
+    .append("g")
+    .call(colorLegendGenerator)
+    .style("transform", "translate(10px, 20px)");
+  const legendTitle = legend
+    .append("text")
+    .attr("x", 0)
+    .attr("y", "-10px")
+    .style("font-size", "0.8em")
+    .html("Cloud Cover");
+
+  // 6. Draw data
+  const markers = bounds
+    .selectAll("circle")
+    .data(dataset)
+    .enter()
+    .append("rect")
+    .attr("height", 5)
+    .attr("width", 5)
+    .attr("x", (d) => xScale(getX(d)))
+    .attr("y", (d) => yScale(getY(d)))
+    .attr("fill", (d) => colorScale(getColor(d)))
+    .attr("fill-opacity", 0.4)
+    .attr("stroke", (d) => colorScale(getColor(d)));
+
+  // 6. Draw peripherals
 }
 drawScatter();
